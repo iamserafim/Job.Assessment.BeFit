@@ -12,49 +12,12 @@ public class SimpleTaskQueue
 
     public void AddTask(Task taskFunc)
     {
-        if (taskFunc == null)
-        {
-            throw new ArgumentNullException(nameof(taskFunc), "Task function cannot be null");
-        }
 
-        taskQueue.Enqueue(taskFunc);
-
-        if (!isProcessing)
-        {
-            StartProcessing();
-        }
     }
 
-    private async void StartProcessing()
+
+    public async System.Threading.Tasks.Task WaitForCompletion()
     {
-        if (!isProcessing)
-        {
-            isProcessing = true;
 
-            await Task.Run(async () =>
-            {
-                while (taskQueue.TryDequeue(out var taskFunc))
-                {
-                    try
-                    {
-                        await taskFunc();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Task execution failed: {ex.Message}");
-                    }
-                }
-
-                isProcessing = false;
-            });
-        }
-    }
-
-    public async Task WaitForCompletion()
-    {
-        while (isProcessing || !taskQueue.IsEmpty)
-        {
-            await Task.Delay(10); // Подождем немного и проверим снова.
-        }
     }
 }
